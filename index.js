@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -50,371 +35,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var paddle_node_sdk_1 = require("@paddle/paddle-node-sdk");
 var fs = require("fs");
 var colour_1 = require("./colour");
 var readline = require("readline");
 var process_1 = require("process");
+var extraPaddle_1 = require("./extraPaddle");
 var rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
 var setupFileLocation = "pricing.json";
-var apiKey = 'pdl_sdbx_apikey_01jz36jnrywm66qh66b4q0az86_vbwhMgVtw5735ekbp1CsP5_ArJ';
-var sandbox = true;
-var allowedCustomProperties = [
-    "productLine",
-    "mapTo",
-    "display"
-];
-var paddleCountries;
-try {
-    paddleCountries = JSON.parse(fs.readFileSync("paddleCountries.json").toString()).data;
-}
-catch (error) {
-    console.log((0, colour_1.colour)(["BgRed", "FgWhite"], "Could not open the file containing the list of country codes"));
-}
-var euroZone = [
-    "Austria",
-    "Belgium",
-    "Croatia",
-    "Cyprus",
-    "Estonia",
-    "Finland",
-    "France",
-    "Germany",
-    "Greece",
-    "Ireland",
-    "Italy",
-    "Latvia",
-    "Lithuania",
-    "Luxembourg",
-    "Malta",
-    "Netherlands",
-    "Portugal",
-    "Slovakia",
-    "Slovenia",
-    "Spain"
-];
-function getCurrencyCountries(currency) {
-    var countries = [];
-    switch (currency) {
-        case "EUR":
-            euroZone.forEach(function (euroZoneCountry) {
-                countries.push(euroZoneCountry);
-            });
-            break;
-        case "CAD":
-            countries.push("Canada");
-            break;
-        case "GBP":
-            //I think there are more
-            countries.push("United Kingdom");
-            break;
-        default:
-            break;
-    }
-    countries = countries.map(function (countryName) {
-        var foundPaddleCountry = paddleCountries.find(function (pCountry) { return pCountry.name == countryName; });
-        if (foundPaddleCountry) {
-            return foundPaddleCountry.code;
-        }
-        else {
-            console.log((0, colour_1.colour)(["BgYellow", "FgBlack"], "Could not find the country code for ".concat(countryName, ".  Please check the country has been spelt correctly.\nThe country will be skipped, and the custom rule will not apply to this country only.")));
-        }
-    });
-    //console.log(colour(["BgBlue","FgGreen","Dim"],countries))
-    return countries;
-}
-var PaddlePrice = /** @class */ (function () {
-    function PaddlePrice(name, unitPrice, billingCycle) {
-        this.description = "Default description";
-        this.unitPriceOverrides = [];
-        this.productId = "";
-        this.customData = null;
-        this.name = name;
-        this.unitPrice = unitPrice;
-        this.billingCycle = billingCycle;
-    }
-    return PaddlePrice;
-}());
-var PaddleBillingCycle = /** @class */ (function () {
-    function PaddleBillingCycle(interval, frequency) {
-        this.interval = interval;
-        this.frequency = frequency;
-    }
-    return PaddleBillingCycle;
-}());
-var PaddleUnitPrice = /** @class */ (function () {
-    function PaddleUnitPrice(amount, currencyCode) {
-        this.amount = amount;
-        this.currencyCode = currencyCode;
-    }
-    return PaddleUnitPrice;
-}());
-var PaddleOverridePrice = /** @class */ (function () {
-    function PaddleOverridePrice(price, countries) {
-        this.unitPrice = price;
-        this.countryCodes = countries;
-    }
-    return PaddleOverridePrice;
-}());
-var PaddleProduct = /** @class */ (function () {
-    function PaddleProduct(name, prices) {
-        this.prices = [];
-        this.name = name;
-        if (prices) {
-            this.prices = prices;
-        }
-    }
-    return PaddleProduct;
-}());
-var StrictPaddleProduct = /** @class */ (function (_super) {
-    __extends(StrictPaddleProduct, _super);
-    function StrictPaddleProduct(name, prices) {
-        var _this = _super.call(this, name, prices) || this;
-        _this.taxCategory = "standard";
-        return _this;
-    }
-    return StrictPaddleProduct;
-}(PaddleProduct));
-var paddle = new paddle_node_sdk_1.Paddle(apiKey, sandbox ? { environment: paddle_node_sdk_1.Environment.sandbox, logLevel: paddle_node_sdk_1.LogLevel.error } : {});
-function getAllProducts() {
-    return __awaiter(this, void 0, void 0, function () {
-        var productCollection, allItems, _a, productCollection_1, productCollection_1_1, product, e_1_1, e_2;
-        var _b, e_1, _c, _d;
-        return __generator(this, function (_e) {
-            switch (_e.label) {
-                case 0:
-                    productCollection = paddle.products.list();
-                    allItems = [];
-                    _e.label = 1;
-                case 1:
-                    _e.trys.push([1, 14, , 15]);
-                    _e.label = 2;
-                case 2:
-                    _e.trys.push([2, 7, 8, 13]);
-                    _a = true, productCollection_1 = __asyncValues(productCollection);
-                    _e.label = 3;
-                case 3: return [4 /*yield*/, productCollection_1.next()];
-                case 4:
-                    if (!(productCollection_1_1 = _e.sent(), _b = productCollection_1_1.done, !_b)) return [3 /*break*/, 6];
-                    _d = productCollection_1_1.value;
-                    _a = false;
-                    product = _d;
-                    allItems.push(product);
-                    _e.label = 5;
-                case 5:
-                    _a = true;
-                    return [3 /*break*/, 3];
-                case 6: return [3 /*break*/, 13];
-                case 7:
-                    e_1_1 = _e.sent();
-                    e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 13];
-                case 8:
-                    _e.trys.push([8, , 11, 12]);
-                    if (!(!_a && !_b && (_c = productCollection_1.return))) return [3 /*break*/, 10];
-                    return [4 /*yield*/, _c.call(productCollection_1)];
-                case 9:
-                    _e.sent();
-                    _e.label = 10;
-                case 10: return [3 /*break*/, 12];
-                case 11:
-                    if (e_1) throw e_1.error;
-                    return [7 /*endfinally*/];
-                case 12: return [7 /*endfinally*/];
-                case 13:
-                    if (allItems.length === 0) {
-                        console.log('No products were found.');
-                    }
-                    return [2 /*return*/, allItems];
-                case 14:
-                    e_2 = _e.sent();
-                    console.error('Error within getAllProducts():', e_2);
-                    throw e_2;
-                case 15: return [2 /*return*/];
-            }
-        });
-    });
-}
-function getProduct(productId, queryParams) {
-    return __awaiter(this, void 0, void 0, function () {
-        var product, e_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.products.get(productId, queryParams)
-                        // Returns a product entity
-                    ];
-                case 1:
-                    product = _a.sent();
-                    // Returns a product entity
-                    return [2 /*return*/, product];
-                case 2:
-                    e_3 = _a.sent();
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function updateProduct(productId, requestBody) {
-    return __awaiter(this, void 0, void 0, function () {
-        var product, e_4;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.products.update(productId, requestBody)
-                        // Returns an updated product entity
-                    ];
-                case 1:
-                    product = _a.sent();
-                    // Returns an updated product entity
-                    return [2 /*return*/, product];
-                case 2:
-                    e_4 = _a.sent();
-                    console.log(JSON.stringify(e_4));
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function createPrice(requestBody) {
-    return __awaiter(this, void 0, void 0, function () {
-        var price, e_5;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.prices.create(requestBody)];
-                case 1:
-                    price = _a.sent();
-                    return [2 /*return*/, price
-                        // Returns a price entity
-                    ];
-                case 2:
-                    e_5 = _a.sent();
-                    console.error('Error creating price:', e_5);
-                    // Handle Network/API errors
-                    throw new Error;
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function archivePrice(priceId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var price, e_6;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.prices.archive(priceId)
-                        // Returns an archived price entity
-                    ];
-                case 1:
-                    price = _a.sent();
-                    // Returns an archived price entity
-                    return [2 /*return*/, price];
-                case 2:
-                    e_6 = _a.sent();
-                    // Handle Network/API errors
-                    console.error("Error archiving price ".concat(priceId, ":"), e_6);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function archiveProduct(productId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var product, e_7;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.products.archive(productId)
-                        // Returns an archived product entity
-                    ];
-                case 1:
-                    product = _a.sent();
-                    // Returns an archived product entity
-                    return [2 /*return*/, product];
-                case 2:
-                    e_7 = _a.sent();
-                    // Handle Network/API errors
-                    console.error("Error archiving product ".concat(productId, ":"), e_7);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function createProduct(requestBody) {
-    return __awaiter(this, void 0, void 0, function () {
-        var product, e_8;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.products.create(requestBody)
-                        // Returns a product entity
-                    ];
-                case 1:
-                    product = _a.sent();
-                    // Returns a product entity
-                    return [2 /*return*/, product];
-                case 2:
-                    e_8 = _a.sent();
-                    console.log(JSON.stringify(e_8, null, 4));
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function updatePrice(priceId, requestBody) {
-    return __awaiter(this, void 0, void 0, function () {
-        var price, e_9;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, paddle.prices.update(priceId, requestBody)
-                        // Returns an updated price entity
-                    ];
-                case 1:
-                    price = _a.sent();
-                    // Returns an updated price entity
-                    return [2 /*return*/, price];
-                case 2:
-                    e_9 = _a.sent();
-                    console.error("Error updating price ".concat(priceId, ":"), e_9);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
 function compare(template, real) {
     return __awaiter(this, void 0, void 0, function () {
-        var currentProducts, issue, _loop_1, _i, real_1, realProduct, _loop_2, _a, template_1, templateProduct;
+        var currentProducts, issue, _loop_1, _i, real_1, realProduct, _loop_2, _a, template_1, templateProduct, error_1;
         var _this = this;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    _b.trys.push([0, 9, , 10]);
                     currentProducts = [];
                     issue = false;
                     _loop_1 = function (realProduct) {
@@ -440,7 +79,7 @@ function compare(template, real) {
                                                     switch (_a.label) {
                                                         case 0:
                                                             if (!(answer == "y" || answer == "Y")) return [3 /*break*/, 2];
-                                                            return [4 /*yield*/, archiveProduct(realProduct.id)];
+                                                            return [4 /*yield*/, (0, extraPaddle_1.archiveProduct)(realProduct.id)];
                                                         case 1:
                                                             _a.sent();
                                                             console.log((0, colour_1.colour)(["FgRed", "Bright"], "Product archived"));
@@ -491,13 +130,13 @@ function compare(template, real) {
                                     if (!currentProducts.includes(templateProduct.name)) return [3 /*break*/, 1];
                                     return [3 /*break*/, 4];
                                 case 1:
-                                    newProd = new StrictPaddleProduct(templateProduct.name);
+                                    newProd = new extraPaddle_1.StrictPaddleProduct(templateProduct.name);
                                     delete newProd.prices;
-                                    return [4 /*yield*/, createProduct(newProd)];
+                                    return [4 /*yield*/, (0, extraPaddle_1.createProduct)(newProd)];
                                 case 2:
                                     _h.sent();
                                     console.log((0, colour_1.colour)(["FgGreen"], "Created a new product: ".concat(templateProduct.name)));
-                                    return [4 /*yield*/, getAllProducts()];
+                                    return [4 /*yield*/, (0, extraPaddle_1.getAllProducts)()];
                                 case 3:
                                     //need to update the real object, as it is now out of date
                                     real = _h.sent();
@@ -506,7 +145,7 @@ function compare(template, real) {
                                     existingProduct = real.find(function (element) {
                                         return element.name == templateProduct.name;
                                     });
-                                    return [4 /*yield*/, getProduct(existingProduct.id, { include: ['prices'] })];
+                                    return [4 /*yield*/, (0, extraPaddle_1.getProduct)(existingProduct.id, { include: ['prices'] })];
                                 case 5:
                                     existingProduct = _h.sent();
                                     archive = false;
@@ -522,7 +161,7 @@ function compare(template, real) {
                                                         //display a little message to explain
                                                         console.log((0, colour_1.colour)(["FgYellow"], "Archived 1 price from the product ".concat(existingProduct.name, ", because it did not match any prices in the template")));
                                                     }
-                                                    return [4 /*yield*/, archivePrice(price.id)];
+                                                    return [4 /*yield*/, (0, extraPaddle_1.archivePrice)(price.id)];
                                                 case 1:
                                                     _j.sent();
                                                     count += 1;
@@ -547,34 +186,34 @@ function compare(template, real) {
                                     if (archive) {
                                         console.log((0, colour_1.colour)(["FgRed", "Bright"], "Archived ".concat(count, " prices from the product ").concat(existingProduct.name)));
                                     }
-                                    currentPaddleProduct = new PaddleProduct(templateProduct.name);
+                                    currentPaddleProduct = new extraPaddle_1.PaddleProduct(templateProduct.name);
                                     templateProduct.prices.forEach(function (templatePrice) {
                                         var _a;
                                         var priceArray = Object.entries(templatePrice.amounts);
                                         //create the object for easier management
-                                        // @ts-ignore
-                                        var basePrice = new PaddleUnitPrice((priceArray[0][1] * 100).toString(), priceArray[0][0]);
+                                        //@ts-ignore
+                                        var basePrice = new extraPaddle_1.PaddleUnitPrice((priceArray[0][1] * 100).toString(), priceArray[0][0]);
                                         //handle the billing cycle for the two hardcoded options
                                         var currentBillingCycle;
                                         switch (templatePrice.billingInterval) {
                                             case "year":
-                                                currentBillingCycle = new PaddleBillingCycle("year", 1);
+                                                currentBillingCycle = new extraPaddle_1.PaddleBillingCycle("year", 1);
                                                 break;
                                             case "month":
-                                                currentBillingCycle = new PaddleBillingCycle("month", 1);
+                                                currentBillingCycle = new extraPaddle_1.PaddleBillingCycle("month", 1);
                                                 break;
                                             default:
                                                 console.log((0, colour_1.colour)(["BgYellow", "FgRed", "Bright"], "A billing cycle property value could not be recognised."));
                                                 throw new Error;
                                                 break;
                                         }
-                                        var currentPrice = new PaddlePrice(templatePrice.name, basePrice, currentBillingCycle);
+                                        var currentPrice = new extraPaddle_1.PaddlePrice(templatePrice.name, basePrice, currentBillingCycle);
                                         priceArray.forEach(function (priceGroup) {
                                             if (priceGroup[0] != basePrice.currencyCode) {
-                                                var relevantCountries = getCurrencyCountries(priceGroup[0]);
+                                                var relevantCountries = (0, extraPaddle_1.getCurrencyCountries)(priceGroup[0]);
                                                 // @ts-ignore
-                                                var currencyPrice = new PaddleUnitPrice((priceGroup[1] * 100).toString(), priceGroup[0]);
-                                                var overridePrice = new PaddleOverridePrice(currencyPrice, relevantCountries);
+                                                var currencyPrice = new extraPaddle_1.PaddleUnitPrice((priceGroup[1] * 100).toString(), priceGroup[0]);
+                                                var overridePrice = new extraPaddle_1.PaddleOverridePrice(currencyPrice, relevantCountries);
                                                 //add the override price to the complete price object
                                                 currentPrice.unitPriceOverrides.push(overridePrice);
                                             }
@@ -584,7 +223,7 @@ function compare(template, real) {
                                         //prices need to be sent seperately, but are included for now
                                         var customData = Object.entries(templatePrice);
                                         customData = customData.filter(function (pair) {
-                                            return allowedCustomProperties.includes(pair[0]);
+                                            return extraPaddle_1.allowedCustomProperties.includes(pair[0]);
                                         });
                                         var customDataObject = {};
                                         customData.forEach(function (pair) {
@@ -595,7 +234,7 @@ function compare(template, real) {
                                     });
                                     currentPrices = currentPaddleProduct.prices;
                                     delete currentPaddleProduct.prices;
-                                    return [4 /*yield*/, updateProduct(existingProduct.id, currentPaddleProduct)];
+                                    return [4 /*yield*/, (0, extraPaddle_1.updateProduct)(existingProduct.id, currentPaddleProduct)];
                                 case 10:
                                     _h.sent();
                                     _loop_4 = function (individualPrice) {
@@ -610,21 +249,21 @@ function compare(template, real) {
                                                     if (!foundPrice) return [3 /*break*/, 2];
                                                     //existing price found, update it
                                                     delete individualPrice.productId;
-                                                    // @ts-ignore
-                                                    return [4 /*yield*/, updatePrice(foundPrice.id, individualPrice)];
+                                                    //@ts-ignore
+                                                    return [4 /*yield*/, (0, extraPaddle_1.updatePrice)(foundPrice.id, individualPrice)];
                                                 case 1:
-                                                    // @ts-ignore
+                                                    //@ts-ignore
                                                     _k.sent();
                                                     console.log((0, colour_1.colour)(["FgGreen"], "Updated the price: ".concat(individualPrice.name, " for the product: ").concat(currentPaddleProduct.name)));
                                                     return [3 /*break*/, 4];
                                                 case 2:
                                                     individualPrice.productId = existingProduct.id;
                                                     //console.log(JSON.stringify(individualPrice,null,4))
-                                                    // @ts-ignore
-                                                    return [4 /*yield*/, createPrice(individualPrice)];
+                                                    //@ts-ignore
+                                                    return [4 /*yield*/, (0, extraPaddle_1.createPrice)(individualPrice)];
                                                 case 3:
                                                     //console.log(JSON.stringify(individualPrice,null,4))
-                                                    // @ts-ignore
+                                                    //@ts-ignore
                                                     _k.sent();
                                                     console.log((0, colour_1.colour)(["FgGreen"], "Added the price: ".concat(individualPrice.name, " to the product: ").concat(currentPaddleProduct.name)));
                                                     _k.label = 4;
@@ -663,16 +302,21 @@ function compare(template, real) {
                 case 8:
                     console.log("Done");
                     return [2 /*return*/];
+                case 9:
+                    error_1 = _b.sent();
+                    console.log(JSON.stringify(error_1, null, 4));
+                    return [3 /*break*/, 10];
+                case 10: return [2 /*return*/];
             }
         });
     });
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var foundProducts, setupFile, error_1, error_2;
+        var foundProducts, setupFile, error_2, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, getAllProducts()];
+                case 0: return [4 /*yield*/, (0, extraPaddle_1.getAllProducts)()];
                 case 1:
                     foundProducts = _a.sent();
                     _a.label = 2;
@@ -689,15 +333,15 @@ function main() {
                     _a.sent();
                     return [3 /*break*/, 6];
                 case 5:
-                    error_1 = _a.sent();
-                    console.log((0, colour_1.colour)(["BgRed", "FgBlack", "Bright"], "A critical error occurred. " + JSON.stringify(error_1, null, 4)));
+                    error_2 = _a.sent();
+                    console.log((0, colour_1.colour)(["BgRed", "FgBlack", "Bright"], "A critical error occurred. " + JSON.stringify(error_2, null, 4)));
                     return [3 /*break*/, 6];
                 case 6:
                     (0, process_1.exit)(0);
                     return [3 /*break*/, 8];
                 case 7:
-                    error_2 = _a.sent();
-                    console.error((0, colour_1.colour)(["FgRed"], "Could not find the specified file, looking for ".concat(setupFileLocation, ", with error ").concat(JSON.stringify(error_2))));
+                    error_3 = _a.sent();
+                    console.error((0, colour_1.colour)(["FgRed"], "Could not find the specified file, looking for ".concat(setupFileLocation, ", with error ").concat(JSON.stringify(error_3))));
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
@@ -709,7 +353,7 @@ function data() {
         var allProducts, product, _i, allProducts_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, getAllProducts()];
+                case 0: return [4 /*yield*/, (0, extraPaddle_1.getAllProducts)()];
                 case 1:
                     allProducts = _a.sent();
                     _i = 0, allProducts_1 = allProducts;
@@ -717,7 +361,7 @@ function data() {
                 case 2:
                     if (!(_i < allProducts_1.length)) return [3 /*break*/, 5];
                     product = allProducts_1[_i];
-                    return [4 /*yield*/, getProduct(product.id, { include: ['prices'] })];
+                    return [4 /*yield*/, (0, extraPaddle_1.getProduct)(product.id, { include: ['prices'] })];
                 case 3:
                     product = _a.sent();
                     console.log((0, colour_1.colour)(["FgMagenta", "Bright"], "The ".concat(product.name, " product:")));
