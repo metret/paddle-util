@@ -1,0 +1,99 @@
+[
+    {
+        "name": "Business (Latest)",
+        "label": "Business",
+        "prices": [
+            {
+                "billingInterval": "year",
+                "amounts": {
+                    "USD": 50,
+                    "GBP": 40,
+                    "EUR": 45,
+                    "CAD": 65
+                },
+                "productLine": "main",
+                "mapTo": "2024_unlimted",
+                "display": 1,
+                "label": "BUS_ANNUAL_MAIN",
+                "name": "Business Annual"
+            },
+            {
+                "billingInterval": "month",
+                "amounts": {
+                    "USD": 5,
+                    "GBP": 4,
+                    "EUR": 4.5,
+                    "CAD": 6.5
+                },
+                "productLine": "main",
+                "mapTo": "2024_unlimted",
+                "display": 2,
+                "label": "BUS_MONTHLY_MAIN",
+                "name": "Business Monthly"
+            },
+            {
+                "billingInterval": "month",
+                "amounts": {
+                    "USD": 35,
+                    "GBP": 28,
+                    "EUR": 32,
+                    "CAD": 45
+                },
+                "productLine": "special",
+                "mapTo": "2024_unlimted",
+                "display": null,
+                "label": "BUS_MONTHLY_SPECIAL",
+                "name": "Business Monthly Special"
+            }
+        ]
+    },
+    {
+        "name": "Starter",
+        "internalLabel": "START",
+        "externalLabel": "Starter Plan",
+        "prices": [
+            {
+                "billingInterval": "year",
+                "amounts": {
+                    "USD": 38,
+                    "GBP": 30,
+                    "EUR": 34,
+                    "CAD": 50
+                },
+                "productLine": "main",
+                "mapTo": "2025_starter",
+                "display": 1,
+                "label": "START_ANNUAL_MAIN",
+                "name": "Starter Annual"
+            },
+            {
+                "billingInterval": "month",
+                "amounts": {
+                    "USD": 3.8,
+                    "GBP": 3,
+                    "EUR": 3.4,
+                    "CAD": 5
+                },
+                "productLine": "main",
+                "mapTo": "2025_starter",
+                "display": 2,
+                "label": "START_MONTHLY_MAIN",
+                "name": "Starter Monthly"
+            },
+            {
+                "billingInterval": "year",
+                "amounts": {
+                    "USD": 495,
+                    "GBP": 390,
+                    "EUR": 445,
+                    "CAD": 650
+                },
+                "productLine": "legacy",
+                "mapTo": "2024_starter",
+                "display": 3,
+                "label": "START_ANNUAL_LEGACY",
+                "name": "Starter Annual (Legacy)"
+            }
+        ]
+    }
+]

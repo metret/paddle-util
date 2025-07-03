@@ -1,0 +1,21 @@
+{
+  "name": "pricing-utility",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"----- Building typescript\"&&tsc",
+    "launch": "echo \"----- Running index.js\"&&node index.js",
+    "restart": "npm run build&&npm run launch",
+    "data": "node index.js find"
+  },
+  "author": "scratchingclaws",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@paddle/paddle-node-sdk": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10"
+  }
+}

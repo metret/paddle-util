@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es5", // Or es3, if you really need to target it
+    //"module": "commonjs", // Or your preferred module system
+    "lib": ["es2018", "dom"], // Add "es2015.promise"
+    // Alternatively, if you want all ES2015 features:
+    // "lib": ["es5", "es2015", "dom"],
+    // Or for modern browsers/Node.js where Promise is native:
+    // "lib": ["es2017", "dom"], // If you can target ES2017 or higher, this implicitly includes Promise
+    //"esModuleInterop": true, // Often helpful for module imports
+    "strict": true,
+    //"skipLibCheck": true, // Recommended for faster compilation
+    // ... other options
+  },
+  "include": ["*.ts"],
+  "exclude": [
+    "node_modules"
+  ]
+}
