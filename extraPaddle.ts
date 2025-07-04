@@ -126,7 +126,7 @@ export class StrictPaddleProduct extends PaddleProduct{
         super(name,prices)
     }
 }
-
+/*
 export let apiKey:string
 if (process.env.PADDLE_API_KEY){
     apiKey = process.env.PADDLE_API_KEY
@@ -136,13 +136,18 @@ if (process.env.PADDLE_API_KEY){
 }
 
 export const sandbox:boolean = true
+*/
+
+const targets = JSON.parse(fs.readFileSync("./targets.json").toString())
+
+const apiKey = targets[process.argv[2]].apiKey
+const sandbox = targets[process.argv[2]].sandbox
+
 export const allowedCustomProperties:string[] = [
     "productLine",
     "mapTo",
     "display"
 ]
-
-
 
 export const paddle = new Paddle(apiKey, sandbox?{environment: Environment.sandbox,logLevel: LogLevel.error}:{});
 

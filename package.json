@@ -1,13 +1,14 @@
 {
   "name": "pricing-utility",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node index.js test",
     "build": "echo \"----- Building typescript\"&&tsc",
-    "launch": "echo \"----- Running index.js\"&&node --env-file=.env index.js",
-    "restart": "npm run build&&npm run launch",
-    "data": "node --env-file=.env index.js find"
+    "prod": "echo \"----- Running index.js\"&&node index.js prod",
+    "prod-read": "echo \"----- Running index.js\"&&node index.js prod read",
+    "restart": "npm run build&&npm run prod",
+    "test-read": "node index.js test read"
   },
   "author": "scratchingclaws",
   "license": "ISC",

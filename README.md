@@ -22,17 +22,9 @@ The latter is the file which contains the data from which this utility creates a
 ### Paddle integration
 
 In order to run this utility, you will need your Paddle API key.
-This will need to be put into a .env file, which should look something like this:
+This will need to be put into the targets.json file
 
-> PADDLE_API_KEY = 'your_api_key_here'
-
-If the API key is for a sandbox environment, you won't need to do anything extra.  Otherwise, you will need to change this line in the index.ts file:
-
-> const sandbox:boolean = true
-
-to
-
-> const sandbox:boolean = false
+If the API key is for a sandbox environment please also tweak the sandbox boolean
 
 ## Usage
 
@@ -50,25 +42,27 @@ or alternatively
 
 To run the utility, run
 
-> npm run launch
+> npm run test
 
-or, if it still needs to be compiled,
+for test mode, or for production
 
-> npm run restart
+> npm run prod
 
-which will build the utility and then run it.
-
-If the code complains about a missing API key, note that the .env file needs to be passed to node, eg:
-
-> node --env-file=.env index.js
+If the code complains about a missing API key, check that the targets.json file contains all the needed keys
 
 ### Data from Paddle
 
-The utility can also be used to retrieve and display all the data found in Paddle.
+The utility can also be used to retrieve and save all the data found in Paddle.
 
-> npm run data
+> npm run test-read
 
-or pass "find" as an argument to the index.js file generated after building the utility
+or for production
 
-> node index.js find
+> npm run prod-read
 
+or pass "read" as the second argument to the index.js file generated after building the utility
+
+> node index.js test read
+
+the first argument is used to specify which keys to use, eg prod or test.
+This can be customised in the targets.json file.

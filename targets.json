@@ -1,0 +1,10 @@
+{
+    "prod": {
+        "apiKey": "some_api_key",
+        "sandbox": false
+    },
+    "test": {
+        "apiKey": "pdl_sdbx_apikey_01jz36jnrywm66qh66b4q0az86_vbwhMgVtw5735ekbp1CsP5_ArJ",
+        "sandbox": true
+    }
+}

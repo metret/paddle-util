@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.colour = void 0;
+exports.Logger = exports.colour = void 0;
 var colour = function (name, text) {
     var colourData = {
         "Reset": "\x1b[0m",
@@ -36,3 +36,12 @@ var colour = function (name, text) {
     return "".concat(prefix).concat(text, "\u001B[0m");
 };
 exports.colour = colour;
+var Logger = /** @class */ (function () {
+    function Logger() {
+    }
+    Logger.prototype.info = function (message) {
+        console.log((0, exports.colour)(['FgGreen'], message));
+    };
+    return Logger;
+}());
+exports.Logger = Logger;

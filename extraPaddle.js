@@ -58,7 +58,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paddle = exports.allowedCustomProperties = exports.sandbox = exports.apiKey = exports.StrictPaddleProduct = exports.PaddleProduct = exports.PaddleOverridePrice = exports.PaddleUnitPrice = exports.PaddleBillingCycle = exports.PaddlePrice = exports.euroZone = exports.paddleCountries = void 0;
+exports.paddle = exports.allowedCustomProperties = exports.StrictPaddleProduct = exports.PaddleProduct = exports.PaddleOverridePrice = exports.PaddleUnitPrice = exports.PaddleBillingCycle = exports.PaddlePrice = exports.euroZone = exports.paddleCountries = void 0;
 exports.getCurrencyCountries = getCurrencyCountries;
 exports.getAllProducts = getAllProducts;
 exports.getProduct = getProduct;
@@ -71,7 +71,6 @@ exports.updatePrice = updatePrice;
 var paddle_node_sdk_1 = require("@paddle/paddle-node-sdk");
 var colour_1 = require("./colour");
 var fs = require("fs");
-var process_1 = require("process");
 try {
     exports.paddleCountries = JSON.parse(fs.readFileSync("paddleCountries.json").toString()).data;
 }
@@ -188,20 +187,26 @@ var StrictPaddleProduct = /** @class */ (function (_super) {
     return StrictPaddleProduct;
 }(PaddleProduct));
 exports.StrictPaddleProduct = StrictPaddleProduct;
-if (process.env.PADDLE_API_KEY) {
-    exports.apiKey = process.env.PADDLE_API_KEY;
+/*
+export let apiKey:string
+if (process.env.PADDLE_API_KEY){
+    apiKey = process.env.PADDLE_API_KEY
+} else {
+    console.log(colour(["BgRed","FgWhite"],"No API key specified"))
+    exit()
 }
-else {
-    console.log((0, colour_1.colour)(["BgRed", "FgWhite"], "No API key specified"));
-    (0, process_1.exit)();
-}
-exports.sandbox = true;
+
+export const sandbox:boolean = true
+*/
+var targets = JSON.parse(fs.readFileSync("./targets.json").toString());
+var apiKey = targets[process.argv[2]].apiKey;
+var sandbox = targets[process.argv[2]].sandbox;
 exports.allowedCustomProperties = [
     "productLine",
     "mapTo",
     "display"
 ];
-exports.paddle = new paddle_node_sdk_1.Paddle(exports.apiKey, exports.sandbox ? { environment: paddle_node_sdk_1.Environment.sandbox, logLevel: paddle_node_sdk_1.LogLevel.error } : {});
+exports.paddle = new paddle_node_sdk_1.Paddle(apiKey, sandbox ? { environment: paddle_node_sdk_1.Environment.sandbox, logLevel: paddle_node_sdk_1.LogLevel.error } : {});
 function getAllProducts() {
     return __awaiter(this, void 0, void 0, function () {
         var productCollection, allItems, _a, productCollection_1, productCollection_1_1, product, e_1_1, e_2;

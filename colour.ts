@@ -36,3 +36,10 @@ export const colour = (name: string[],text: any) => {
     })
     return `${prefix}${text}\x1b[0m`
 }
+
+export class Logger {
+
+    public info(message:string) {
+        console.log(colour(['FgGreen'], message))
+    }
+}
